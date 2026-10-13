@@ -11,6 +11,7 @@ const PADDLE_WIDTH = BRICK_WIDTH * 2;
 const PADDLE_HEIGHT = BRICK_HEIGHT / 2;
 
 const ORIGINAL_BALL_SIZE = 5;
+const BALL_SPEED = 3.3;
 
 const bricks = [];
 
@@ -92,7 +93,7 @@ const ball = {
     y: 260,
     width: 5,
     height: 5,
-    speed: 3,
+    speed: BALL_SPEED,
     dx: 0, // Ball x velocity
     dy: 0  // Ball y velocity
 };
@@ -101,7 +102,7 @@ const ball = {
 /// MUTATORS AND ACCESSORS
 ////////////////////////////
 
-const ORIGINAL_BALL_SPEED = ball.speed;
+const ORIGINAL_BALL_SPEED = BALL_SPEED;
 const ORIGINAL_PADDLE_WIDTH = paddle.width;
 
 function setPaddlePosition(horizontalPosition, verticalPosition) {
@@ -118,14 +119,19 @@ function setBallPosition(horizontalPosition, verticalPosition) {
 }
 
 function setBallSpeed(newSpeed) {
-    let ratioX = ball.dx / ball.speed;
-    let ratioY = ball.dy / ball.speed;
+    const currentSpeed = Math.hypot(ball.dx, ball.dy);
 
     ball.speed = newSpeed;
 
     // Adjust dx and dy based on the new speed while maintaining direction
-    ball.dx = ratioX * ball.speed;
-    ball.dy = ratioY * ball.speed;
+    if (currentSpeed === 0) {
+        ball.dx = ball.speed;
+        ball.dy = 0;
+        return;
+    }
+
+    ball.dx = (ball.dx / currentSpeed) * ball.speed;
+    ball.dy = (ball.dy / currentSpeed) * ball.speed;
 }
 
 function setBallSize(newSize) {
@@ -203,21 +209,19 @@ function collides(obj1, obj2) {
 function updateScore() {
     const scoreElement = document.getElementById('score');
     scoreElement.textContent = `Score: ${score}`;
-
-    // Increase ball speed every 20 points
-    if (score % 20 == 0) {
-        updateBallSpeed();
-    }
 }
 
 function updateBallSpeed() {
-    const speedIncreaseFactor = 1.3;
-    ball.speed *= speedIncreaseFactor;
+    // Preserve the current direction while updating the total speed.
+    const currentSpeed = Math.hypot(ball.dx, ball.dy);
+    if (currentSpeed === 0) {
+        ball.dx = ball.speed;
+        ball.dy = 0;
+        return;
+    }
 
-    // Update the ball's velocity components based on the new speed
-    // Preserve the direction of the ball while updating speed
-    ball.dx = (ball.dx / Math.abs(ball.dx)) * ball.speed;
-    ball.dy = (ball.dy / Math.abs(ball.dy)) * ball.speed;
+    ball.dx = (ball.dx / currentSpeed) * ball.speed;
+    ball.dy = (ball.dy / currentSpeed) * ball.speed;
 }
 
 function showGameOver() {
@@ -244,17 +248,18 @@ function hideWinScreen() {
 function resetBall() {
     ball.x = canvas.width / 2;
     ball.y = paddle.y - ball.height; // Position the ball just above the paddle
-    ball.speed = 1;
-    ball.dx = ball.speed * (Math.random() < 0.5 ? -1 : 1); // Randomize left or right direction
-    ball.dy = -ball.speed; // Always move up
+    ball.speed = BALL_SPEED;
+    const horizontalDirection = Math.random() < 0.5 ? -1 : 1;
+    ball.dx = horizontalDirection * ball.speed / Math.sqrt(2); // Randomize left or right direction
+    ball.dy = -ball.speed / Math.sqrt(2); // Always move up
 }
 
 function resetPaddle() {
     paddle.x = canvas.width / 2 - PADDLE_WIDTH / 2;
     paddle.y = 440;
-    width: PADDLE_WIDTH;
-    height: PADDLE_HEIGHT;
-    dx: 0;
+    paddle.width = PADDLE_WIDTH;
+    paddle.height = PADDLE_HEIGHT;
+    paddle.dx = 0;
 }
 
 
@@ -412,12 +417,18 @@ function moveBall() {
 
     // Wall collision logic
     // Left & Right walls
-    if (ball.x < WALL_WIDTH || ball.x + ball.width > canvas.width - WALL_WIDTH) {
-        ball.dx *= -1;
+    if (ball.x < WALL_WIDTH) {
+        ball.x = WALL_WIDTH;
+        ball.dx = Math.abs(ball.dx);
+    }
+    if (ball.x + ball.width > canvas.width - WALL_WIDTH) {
+        ball.x = canvas.width - WALL_WIDTH - ball.width;
+        ball.dx = -Math.abs(ball.dx);
     }
     // Top wall
     if (ball.y < WALL_WIDTH) {
-        ball.dy *= -1;
+        ball.y = WALL_WIDTH;
+        ball.dy = Math.abs(ball.dy);
     }
 
     // Reset ball if it goes below the screen
@@ -426,9 +437,21 @@ function moveBall() {
     }
 }
 function checkBallPaddleCollision() {
-    // If ball collides with paddle, change y velocity
-    if (collides(ball, paddle)) {
-        ball.dy *= -1;
+    // If the downward-moving ball collides with the paddle, steer it based on the hit position
+    if (collides(ball, paddle) && ball.dy > 0) {
+        const paddleCenter = paddle.x + paddle.width / 2;
+        const ballCenter = ball.x + ball.width / 2;
+        const hitPosition = (ballCenter - paddleCenter) / (paddle.width / 2);
+        const MAX_HORIZONTAL_FACTOR = 0.8;
+        const horizontalFactor = Math.max(
+            -MAX_HORIZONTAL_FACTOR,
+            Math.min(MAX_HORIZONTAL_FACTOR, hitPosition)
+        );
+
+        ball.dx = horizontalFactor * ball.speed;
+        ball.dy = -Math.sqrt(
+            Math.max(0, ball.speed ** 2 - ball.dx ** 2)
+        );
         ball.y = paddle.y - ball.height;
     }
 }

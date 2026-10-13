@@ -1,50 +1,48 @@
 # Breakout HTML Game
 
-This repository contains the code for a classic Breakout game implemented in HTML5, CSS3, and vanilla JavaScript. Breakout is an arcade game developed and published by Atari, Inc., and this project is a homage to the original game with some modern twists.
+A classic Breakout game built with **HTML5**, **CSS3**, and **vanilla JavaScript**.
+
+This project is a small homage to Atari's original arcade classic, enhanced with responsive controls, multiple levels, power-ups, and skill-based paddle bounces.
+
+Originally forked from [danieldotwav/Breakout-HTML](https://github.com/danieldotwav/Breakout-HTML).
 
 ![Breakout](https://github.com/danieldotwav/Breakout-HTML/assets/31682816/35c2b147-f067-497d-8bd8-0e501ceca638)
 
-[Play Online](https://danieldotwav.github.io/Breakout-HTML/)
+[Play Online](https://ethanhunt1981.github.io/Breakout-HTML/)
 
 ## Features
 
-- Classic Breakout gameplay mechanics
-- Score tracking with speed increase every 20 points
-- Responsive canvas rendering
-- Simple and intuitive controls
-- Start, win, and game over screens
-- Powerups!
+- Classic Breakout gameplay
+- Multiple selectable levels
+- Score tracking
+- Responsive canvas-based rendering
+- Keyboard and touch controls
+- Start, pause, win, and game-over screens
+- Skill-based paddle bounce:
+  - Hit the ball near the left side of the paddle to send it left.
+  - Hit the center to send it mostly straight upward.
+  - Hit the ball near the right side of the paddle to send it right.
+- Consistent ball speed during normal gameplay
+- Power-ups:
+  - **Slow Ball** — Temporarily reduces the ball speed
+  - **Wider Paddle** — Temporarily increases paddle width
+  - **Big Ball** — Temporarily increases ball size
 
 ## Getting Started
 
-### Desktop Controls
-- Directional Buttons (Left and Right)
-- Pause Menu (Enter Key)
-	- Press Enter to Leave Pause Menu
-	- Level Selection (Press 1, 2, or 3 to render new level)
-
-### Mobile Contols
-- Tap on the paddle to start
-- Drag the paddle left and right to move
-- Tap on the 'LEVEL X' text to cycle between different levels
-- To reset, simply tap on the paddle again
-
 ### Prerequisites
 
-- A modern web browser that supports HTML5, CSS3, and JavaScript
+- A modern browser with support for:
+  - HTML5
+  - CSS3
+  - JavaScript
 
-## Usage
+No build tools, dependencies, or frameworks are required.
 
-Use the left and right arrow keys to move the paddle. The goal is to break all the bricks without letting the ball fall below the paddle. Every time you hit a brick, your score increases, and every 20 points, the ball's speed will increase, raising the challenge!
+### Run Locally
 
-## Contributing
+Clone this repository:
 
-Contributions are what make the open-source community such an amazing place to learn, inspire, and create. Any contributions you make are **greatly appreciated**.
-
-If you have a suggestion that would make this better, please fork the repo and create a pull request. You can also simply open an issue with the tag "enhancement".
-
-1. Fork the Project
-2. Create your Feature Branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the Branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+```bash
+git clone https://github.com/ethanhunt1981/Breakout-HTML.git
+cd Breakout-HTML
